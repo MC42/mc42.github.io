@@ -47,7 +47,13 @@ var JSONBingo = {"squares": [
 {"square": "no hard cap on max score"},
 {"square": "people reading the manual without being told"},
 {"square": "Coopertition FIRST"},
-{"square": "Climbing Endgame"}   	
+{"square": "Climbing Endgame"}
+{"square": "Derek playing with field element"} 
+{"square": "Uncomfortable FIRST employee"}
+{"square": "obviously scripted & cringe dialog"}
+{"square": "Dean in helicopter"}
+{"square": "forced dialog in Dean's house"}
+{"square": "\"Jokes\""}    	
     ]
 };
 
