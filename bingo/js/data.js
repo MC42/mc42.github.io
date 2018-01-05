@@ -39,7 +39,7 @@ var JSONBingo = {"squares": [
 {"square": "over use of denim "},
 {"square": "new power up logo after kickoff"},
 {"square": "Michelle Long talking fast"},
-{"square": "old game elements make cameo"},
+{"square": "ld game elements make cameo"},
 {"square": "FIRST website crashes"},
 {"square": "over 7 minutes of talking in 1 scene"},
 {"square": "plead for alumni to come back and give back"},
@@ -53,6 +53,9 @@ var JSONBingo = {"squares": [
 {"square": "obviously scripted & cringe dialog"},
 {"square": "Dean in helicopter"},
 {"square": "forced dialog in Dean's house"},
+{"square": "Arcade machine from teaser"},
+{"square": "Demin clothing that is not jeans"},
+{"square": "\"Reee-cycle\""},
 {"square": "\"Jokes\""}    	
     ]
 };
