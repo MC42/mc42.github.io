@@ -1,19 +1,39 @@
-<!DOCTYPE html>
-<html>
-<body>
+<style>
+button {
+width: 100%;
+height: 100%;
+}
 
-<form>
-	<h4>Auto Mobility</h4>
-  <input type="radio" name="gender" value="male" checked> Reached
-  <input type="radio" name="gender" value="female"> Crossed
-  <input type="radio" name="gender" value="other"> Immobile
+.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: auto;
+  background: lime; /* Just to visualize the extent */
   
-  <h4>Test</h4>
-   First name:<br>
-  <input type="text" name="firstname"><br>
-  Last name:<br>
-  <input type="text" name="lastname">
-</form> 
+}
+</style>
+<div class="fullscreen">
+<button id="button">click</button>
+</div>
+<script>
+(function(window, document, undefined){
+    'use strict';
+    var start;
+    var end;
+    var delta;
+    var button = document.getElementById("button");
 
-</body>
-</html>
+    button.addEventListener("mousedown", function(){
+        start = new Date();
+    });
+
+    button.addEventListener("mouseup", function() {
+        end = new Date();
+        delta = end - start;
+console.log(delta);
+    });
+})(window, document);
+</script>
