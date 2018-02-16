@@ -1,0 +1,71 @@
+<style>
+body {
+font-family:sans-serif;
+background-image:url("images/direct-relief.png");
+background-repeat: space;
+background-size: 100%;
+background-color: #000;
+color:#F8F4D9;
+}
+#wrapper { 
+width: 50%; 
+margin: 0 auto; 
+background-color: rgba(0,0,0,.7);
+border-width: 2px;
+border-radius: 5px;
+border-style:solid;
+border-color:rgba(255,255,255,.6);
+}
+#center {
+text-align:center;
+width: 50%; 
+margin: 0 auto; 
+}
+.center {
+text-align:center;
+width: 50%; 
+margin: 0 auto; 
+}
+
+.corner {
+	position:absolute;
+	bottom:0px;
+}
+
+.fullwidth {
+width: 100%;
+}
+</style>
+
+<body>
+<div id="wrapper">
+	<h1 id="center">Does it have to go on the CAW?</h1>
+	<br>
+	<div class="center">
+<input id = "c1" type="checkbox" name="c1" value="true" >Is it COTS?<br>
+<input id="c2" type="checkbox" name="c2" value="true" >Is it > $5.00?<br>
+<input id ="c3" type="checkbox" name="c3" value="true" >Did it come in the Kit of Parts?<br>
+
+<input type=button value="Check" onclick="checkitems()"></a>
+</div>
+
+<script>
+function isChecked(checkbox) {
+return document.getElementById(checkbox).checked;
+}
+
+function checkitems() {
+if (isChecked("c3")) {
+alert("You don't have to include it.")
+
+}
+else if (isChecked("c1") && isChecked("c2")) {
+alert("You must include it.");
+
+}
+else if (isChecked("c1") && !isChecked("c2")) {
+alert("You don't have to include it.");
+}
+}
+
+</script>
