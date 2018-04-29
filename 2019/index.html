@@ -1,0 +1,156 @@
+<head>
+<!-- TBA Header, remember to import. -->
+
+<style>
+
+@font-face {
+    font-family: "DSDIGI";
+    src: url("DSDIGI.woff") format('woff');
+}
+
+html,body {
+  background: rgb(0, 0, 0);
+  height: 100%;
+	margin: 0;
+  overflow: hidden;
+	padding: 0;
+  position: absolute;
+  width: 100%;
+  canvas {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 100ms ease;
+  }
+}
+
+#outPopUp {
+
+  display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+  display: -ms-flexbox;  /* TWEENER - IE 10 */
+  display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+  display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
+  
+  justify-content: center;
+  align-items: center;
+
+
+  position: absolute;
+  width: 300px;
+  height: 200px;
+  z-index: 15;
+  top: 50%;
+  left: 50%;
+  margin: -100px 0 0 -150px;
+  background: rgba(0, 0, 0, 0.34);
+  font-family: 'DSDIGI';
+  color:white;
+  font-size: 10vh;
+}
+
+#countdown-finish-time {
+  display: none;
+}
+
+</style>
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+// TBA COUNTDOWN CODE MODIFIED
+var finish_utc;
+$(document).ready(function(){
+	if ($('#countdown-finish-time').length != 0) {
+	  var utc_iso8601 = $('#countdown-finish-time').html();
+	  finish_utc = new Date(utc_iso8601);
+	  update_countdown();
+	}
+});
+
+function update_countdown() {
+  var current_utc = new Date().getTime();
+  var time_diff = finish_utc - current_utc;
+  var seconds = Math.floor(time_diff / 1000);
+  var minutes = Math.floor(seconds / 60);
+  var hours = Math.floor(minutes / 60);
+  var days = Math.floor(hours / 24);
+  var content;
+
+  hours %= 24;
+  minutes %= 60;
+  seconds %= 60;
+  
+  if (time_diff < 0) {
+      $('.countdown').remove();
+  }
+
+  $('.countdown-days').text(days);
+  $('.countdown-hours').text(hours);
+  $('.countdown-minutes').text(minutes);
+  $('.countdown-seconds').text(seconds);
+  setTimeout('update_countdown()', 1000);
+}
+</script>
+
+<script>
+var dd = document.createElement("canvas");
+var cv = dd.getContext("2d");
+var sw = window.screen.width;
+var sh = window.screen.height;
+var vcx = document.body.clientWidth/2;
+var vcy = document.body.clientHeight/2;
+var rv = 1000;
+var rot = 0;
+var dim = Math.sqrt((sw*sw)+(sh*sh));
+var w = dd.width = dim;
+var h = dd.height = dim;
+var strs = [];
+var nstrs = 1500;
+document.body.appendChild(dd);
+function rInt(s,b) {
+  min=Math.ceil(s);max=Math.floor(b);
+  return Math.floor(Math.random()*(b-s+1))+s;
+}
+function Star(x,y,sz,s,o) {
+	this.x = parseInt(x);
+	this.y = parseInt(y);
+  this.radius = parseInt(sz);
+	this.speed = parseInt(s);
+	this.opacity = o;
+  this.draw = function(){
+    cv.beginPath();
+    cv.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+    cv.closePath();
+    cv.fillStyle = "rgba(255,255,255,"+this.opacity+")";
+    cv.fill();
+  }
+}
+function draw() {
+  cv.clearRect(0,0,w,h);
+  for(i=0; i<nstrs;i++){
+    strs[i].draw();
+    strs[i].x -= strs[i].speed/2;
+    if(strs[i].x <= 0){
+      strs[i] = new Star(w,rInt(0,h),rInt(1,6)/3,rInt(1,3),rInt(4,10)/10);
+    }
+  }
+  window.requestAnimationFrame(draw);
+}
+function init() {
+  for(i=0; i<nstrs;i++) {
+    strs[i] = new Star(rInt(0,w),rInt(0,h),rInt(1,6)/3,rInt(1,5),rInt(4,10)/10);
+  }
+  draw();
+}
+init();
+
+</script>
+<div id="outPopUp">
+<div id="countdown-finish-time">2019-01-05T15:00:00.000Z</div>
+        <div class="countdown-number countdown-days">--</div><div class="countdown-label day-label">:</div>
+        <div class="countdown-number countdown-hours">--</div><div class="countdown-label">:</div>
+        <div class="countdown-number countdown-minutes">--</div><div class="countdown-label">:</div>
+<div class="countdown-number countdown-seconds">--</div>
+</div>
+</body>
