@@ -4,61 +4,67 @@
 
 <style>
 
-@font-face {
-    font-family: "DSDIGI";
-    src: url("DSDIGI.woff") format('woff');
+html,body {
+	background: rgb(0, 0, 0);
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 100%;
 }
 
-html,body {
-  background: rgb(0, 0, 0);
-  height: 100%;
-	margin: 0;
-  overflow: hidden;
-	padding: 0;
-  position: absolute;
-  width: 100%;
-  canvas {
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transition: transform 100ms ease;
-  }
+canvas {
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	transition: transform 100ms ease;
 }
 
 #outPopUp {
 
-  display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
-  display: -ms-flexbox;  /* TWEENER - IE 10 */
-  display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
-  display: flex;         /* NEW, Spec - Firefox, Chrome, Opera */
+	display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+	display: -ms-flexbox;  /* TWEENER - IE 10 */
+	display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+	display: flex;		 /* NEW, Spec - Firefox, Chrome, Opera */
   
-  justify-content: center;
-  align-items: center;
+	justify-content: center;
+	align-items: center;
 
 
-  position: absolute;
-  width: 300px;
-  height: 200px;
-  z-index: 15;
-  top: 50%;
-  left: 50%;
-  margin: -100px 0 0 -150px;
-  background: rgba(0, 0, 0, 0.34);
-  font-family: 'DSDIGI';
-  color:white;
-  font-size: 10vh;
+	position: absolute;
+	width: 300px;
+	height: 200px;
+	z-index: 15;
+	top: 50%;
+	left: 50%;
+	margin: -100px 0 0 -150px;
+	background: rgba(0, 0, 0, 0.34);
+	font-family: 'Segment7Standard';
+	color:white;
+	font-size: 10vh;
 }
 
 #countdown-finish-time {
-  display: none;
+	display: none;
 }
 
 </style>
 
+<link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/segment7" type="text/css"/> 
+
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
+
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+
 // TBA COUNTDOWN CODE MODIFIED
 var finish_utc;
 $(document).ready(function(){
@@ -83,13 +89,13 @@ function update_countdown() {
   seconds %= 60;
   
   if (time_diff < 0) {
-      $('.countdown').remove();
+	  $('.outPopUp').remove();
   }
 
-  $('.countdown-days').text(days);
-  $('.countdown-hours').text(hours);
-  $('.countdown-minutes').text(minutes);
-  $('.countdown-seconds').text(seconds);
+  $('.countdown-days').text(pad(days,3));
+  $('.countdown-hours').text(pad(hours,2));
+  $('.countdown-minutes').text(pad(minutes,2));
+  $('.countdown-seconds').text(pad(seconds,2));
   setTimeout('update_countdown()', 1000);
 }
 </script>
@@ -120,27 +126,27 @@ function Star(x,y,sz,s,o) {
 	this.speed = parseInt(s);
 	this.opacity = o;
   this.draw = function(){
-    cv.beginPath();
-    cv.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-    cv.closePath();
-    cv.fillStyle = "rgba(255,255,255,"+this.opacity+")";
-    cv.fill();
+	cv.beginPath();
+	cv.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+	cv.closePath();
+	cv.fillStyle = "rgba(255,255,255,"+this.opacity+")";
+	cv.fill();
   }
 }
 function draw() {
   cv.clearRect(0,0,w,h);
   for(i=0; i<nstrs;i++){
-    strs[i].draw();
-    strs[i].x -= strs[i].speed/2;
-    if(strs[i].x <= 0){
-      strs[i] = new Star(w,rInt(0,h),rInt(1,6)/3,rInt(1,3),rInt(4,10)/10);
-    }
+	strs[i].draw();
+	strs[i].x -= strs[i].speed/2;
+	if(strs[i].x <= 0){
+	  strs[i] = new Star(w,rInt(0,h),rInt(1,6)/3,rInt(1,3),rInt(4,10)/10);
+	}
   }
   window.requestAnimationFrame(draw);
 }
 function init() {
   for(i=0; i<nstrs;i++) {
-    strs[i] = new Star(rInt(0,w),rInt(0,h),rInt(1,6)/3,rInt(1,5),rInt(4,10)/10);
+	strs[i] = new Star(rInt(0,w),rInt(0,h),rInt(1,6)/3,rInt(1,5),rInt(4,10)/10);
   }
   draw();
 }
@@ -149,9 +155,9 @@ init();
 </script>
 <div id="outPopUp">
 <div id="countdown-finish-time">2019-01-05T15:00:00.000Z</div>
-        <div class="countdown-number countdown-days">--</div><div class="countdown-label day-label">:</div>
-        <div class="countdown-number countdown-hours">--</div><div class="countdown-label">:</div>
-        <div class="countdown-number countdown-minutes">--</div><div class="countdown-label">:</div>
+		<div class="countdown-number countdown-days">--</div><div class="countdown-label day-label">&nbsp</div>
+		<div class="countdown-number countdown-hours">--</div><div class="countdown-label">&nbsp</div>
+		<div class="countdown-number countdown-minutes">--</div><div class="countdown-label">&nbsp</div>
 <div class="countdown-number countdown-seconds">--</div>
 </div>
 </body>
