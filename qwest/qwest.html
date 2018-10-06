@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<title>ℚ𝕨𝔼𝕊𝕋 𝔸𝕡𝕡</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+.fullwidth {
+width:100%;
+text-align:center;
+}
+</style>
+
+<script>
+	
+
+//Calculation Stuff
+
+//Inverse Error Function
+// Shamelessly stolen from https://stackoverflow.com/questions/12556685/is-there-a-javascript-implementation-of-the-inverse-error-function-akin-to-matl
+function inverf(x){
+        var z;
+        var a  = 0.147;                                                   
+        var the_sign_of_x;
+        if(0==x) {
+            the_sign_of_x = 0;
+        } else if(x>0){
+            the_sign_of_x = 1;
+        } else {
+            the_sign_of_x = -1;
+        }
+
+        if(0 != x) {
+            var ln_1minus_x_sqrd = Math.log(1-x*x);
+            var ln_1minusxx_by_a = ln_1minus_x_sqrd / a;
+            var ln_1minusxx_by_2 = ln_1minus_x_sqrd / 2;
+            var ln_etc_by2_plus2 = ln_1minusxx_by_2 + (2/(Math.PI * a));
+            var first_sqrt = Math.sqrt((ln_etc_by2_plus2*ln_etc_by2_plus2)-ln_1minusxx_by_a);
+            var second_sqrt = Math.sqrt(first_sqrt - ln_etc_by2_plus2);
+            z = second_sqrt * the_sign_of_x;
+        } else { // x is zero
+            z = 0;
+        }
+  return z;
+}
+
+//Returns rank points of team at event, needs in form "frcxxxx" and "20XXeventcode" as seen in the TBA URL.
+function returnRankPoints(team, event) {
+	var alpha = 1.07 //Variable gin the manual.
+	var eventStatus = getTBA("team/" + team + "/event/" + event + "/status");
+	try {
+		var ranking = eventStatus.qual.ranking.rank;
+		var numTeams = eventStatus.qual.num_teams;
+
+		var qual_points = (Math.ceil(inverf((numTeams - 2 * ranking + 2) / (alpha * numTeams)) * (10.0 / inverf(1.0 / alpha)) + 12))
+		return qual_points;
+	}
+	catch(err){
+		return 0;
+	}
+}
+
+// Award Points Calculation, done for 2018 season rules.
+
+var awardLookupTable = {
+0:60,	//Chairman's
+9:45,	//EI
+10:25,	//RAS
+15:15,	//RI
+3:10,	//WFFA
+2:0,	//Event finalist
+//Engineering Quintifecta, who cares which is which.
+29:20,
+21:20,
+29:20,
+20:20,
+16:20,
+2:0	//Event finalist
+}
+
+var awardCmpTable = {
+0:110,	//CCA
+69:90,	//CCAF
+9:60,	//EI
+10:35,	//RAS
+15:20,	//RI
+3:30,	//WFA
+//Engineering Quintifecta
+29:30,
+21:30,
+29:30,
+20:30,
+16:30
+}
+//Award ports, be sure to update for the 2019 SLFF season.
+function returnAwardPoints(team, event) {
+	var totalPoints = 0;
+	var awards = getTBA("team/" + team +  "/event/" + event + "/awards");
+	var eventType = getTBA("event/" + event).event_type;
+	championshipEventTypes = [3,4]; //These were taken from TBA sourcecode.  https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
+	
+	for (i = 0; i < awards.length; i++) {
+		if (championshipEventTypes.includes(eventType)) {
+			if (awards[i].award_type in awardCmpTable) {
+			totalPoints+=(awardCmpTable[awards[i].award_type]);
+		}else {
+			totalPoints+=10; //All other awards are 10 at CMP.
+		}
+		};
+		if (![99,100,-1].includes(eventType)) {
+			if (awards[i].award_type in awardLookupTable) {
+			totalPoints+=(awardLookupTable[awards[i].award_type]);
+		}
+		else {
+			totalPoints+=5; //All other awards are 5 according to rules.
+			}
+		}
+	}
+	return totalPoints;
+	
+}
+
+//Return playoff points.
+function returnPlayoffPoints(team, event) {
+	var matchesAtEvent = getTBA("team/" + team + "/event/" + event + "/matches");
+	var pointsEarned = 0;
+	var teamsAlliance = null;
+	for (i = 0; i < matchesAtEvent.length; i++) {
+			if (matchesAtEvent[i].comp_level != "qm") {
+				try {
+					if (matchesAtEvent[i].alliances.blue.team_keys.includes(team)) {
+						teamsAlliance = "blue";
+					}
+					if (matchesAtEvent[i].alliances.red.team_keys.includes(team)) {
+						teamsAlliance = "red";
+					}
+					
+					if (teamsAlliance == matchesAtEvent[i].winning_alliance) {
+					pointsEarned+=5;
+
+					}
+				}
+				catch(err) {
+					console.log(err);
+				}
+		}
+	}
+	return pointsEarned;
+}
+
+function returnAlliancePoints(team, event) {
+	var eventStatus = getTBA("team/" + team + "/event/" + event + "/status");
+	if (eventStatus != null) {
+		if (eventStatus.alliance != null) {
+				if ([0,1].includes(eventStatus.alliance.pick)) {
+					return (17 - eventStatus.alliance.number);
+				}else {
+					return (17 - 8  - ( 9 - eventStatus.alliance.number));
+				}
+		}
+	}
+	return 0;
+}
+
+function calculateEventPointsTotal(team, event) {
+	var total = 0;
+	a = returnAlliancePoints(team, event.key);
+	b = returnPlayoffPoints(team,event.key);
+	c = returnAwardPoints(team,event.key);
+	d = returnRankPoints(team, event.key);
+	//console.log(a,b,c,d);
+	
+	if (document.getElementById("rankPointsBool").checked) {
+		total+=d;
+	}
+	if (document.getElementById("awardPointsBool").checked) {
+		total+=c;
+	}
+		if (document.getElementById("playoffPointsBool").checked) {
+		total+=b;
+	}
+		if (document.getElementById("alliancePointsBool").checked) {
+		total+=a;
+	}
+	
+	return total;
+	
+	
+}
+//Bastardized getTBA for synchronous calls.
+function getTBA(url) {
+return JSON.parse($.ajax({
+         url: "https://www.thebluealliance.com/api/v3/" + url,
+         type: "GET",
+         beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', '2dZKrdov7pGW7HW3kA7Ib8MXa6je84N8ecaqhk3dbFK0SACi27TS8XLU4P5U6GPf');},
+	async: false
+      }).responseText);
+};
+
+// FUCK IT I HATE THIS
+
+
+/*
+
+d ="eventID" type="text" placeholder="TBA Event ID (ie. 2018cc)"></div><br>
+	<div><input class="fullwidth" id ="eventTeamList
+	
+	*/
+
+
+
+// Javascript Strip Function
+// Stolen from: https://stackoverflow.com/questions/1418050/string-strip-for-javascript
+
+if(typeof(String.prototype.trim) === "undefined")
+{
+    String.prototype.trim = function() 
+    {
+        return String(this).replace(/^\s+|\s+$/g, '');
+    };
+}
+
+function theBigKahuna() {
+	
+if (document.getElementById("eventId").value != "") {
+		teamList = getTBA("event/" + document.getElementById("eventId").value  +"/teams/simple");
+		teamList.sort(function(a,b) {
+	return a.team_number - b.team_number;
+	});
+}
+else if (document.getElementById("eventTeamList").value != "") {
+	tempTeamList = document.getElementById("eventTeamList").value.split(",");
+	tempTeamList = tempTeamList.map(x => x.trim());
+	tempTeamList = tempTeamList.map(x => Object({"key": "frc" + x, "team_number" : x}));
+	teamList = tempTeamList;
+}
+
+document.getElementById("mainBody").innerHTML+="<tr><th>Team No.</th><th>Event 1</th><th>Event 2</th><th>Event 3</th><th>Event 4</th><th>Event 5</th></tr>"; //Makes the root of the table.
+
+for (teamListIndex = 0; teamListIndex < teamList.length; teamListIndex++) {
+	console.log("getting index team " + teamListIndex)
+	var teamEvents = getTBA("team/" +  teamList[teamListIndex].key + "/events/2018");
+	console.log(teamEvents);
+	actualTeamEvents = [];
+	
+	for (i = 0; i < teamEvents.length; i++) {
+		if ([0,1,2,5].includes(teamEvents[i].event_type)) {
+			actualTeamEvents.push(teamEvents[i]);
+		}
+	}
+	console.log("stripped down events");
+	console.log(actualTeamEvents);
+	
+	
+	//document.getElementById("mainBody").innerHTML+="<tr><td>" + teamList[teamListIndex].team_number + "";
+	var row = document.getElementById("mainBody").insertRow(document.getElementById("mainBody").rows.length);
+	var cellNumberPlaceHolder = 0;
+	var cell0 = row.insertCell(cellNumberPlaceHolder);
+	cellNumberPlaceHolder++;
+	cell0.innerHTML = teamList[teamListIndex].team_number;
+	for (teamEventIndex = 0; teamEventIndex < actualTeamEvents.length; teamEventIndex++) {
+		var currentEventPoints = calculateEventPointsTotal(teamList[teamListIndex].key, actualTeamEvents[teamEventIndex]);
+		var currentCell = row.insertCell(cellNumberPlaceHolder);
+		currentCell.innerHTML = "<td>" + currentEventPoints + "(" + actualTeamEvents[teamEventIndex].key + ")";
+		//console.log(currentEventPoints, actualTeamEvents[teamEventIndex]);
+		cellNumberPlaceHolder++;
+	}
+}
+	
+	
+}
+
+
+</script>
+
+<body>
+<div class="pure-g">
+    <div class="pure-u-1-5" style="align:center;">
+
+        <div><input  id ="eventId" type="text" placeholder="TBA Event ID (ie. 2018cc)"></div>
+	<div><input  id ="eventTeamList" type="text" placeholder="Custom List (ie. 217,1114,etc.)"></div>
+	<div><input id="rankPointsBool" checked type="checkbox">Include Rank Points</input></div>
+	<div><input id="awardPointsBool" checked type="checkbox">Include Award Points</input></div>
+	<div><input id="alliancePointsBool" checked type="checkbox">Include Alliance Points</input></div>
+	<div><input id="playoffPointsBool" checked type="checkbox">Include Playoff Points</input></div>
+	<hr>
+	<div><input type="checkbox">Include Championship Points</input></div>
+        <button class="pure-button pure-button-primary fullwidth" onclick="theBigKahuna()" >Get Team Data</button>
+
+
+</div>
+    <div class="pure-u-4-5">
+	<table class="pure-table fullwidth" id="mainBody">
+	</table>
+ </div>
+
+</div>
+</body>
+
+
+
