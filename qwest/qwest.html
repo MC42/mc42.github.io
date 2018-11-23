@@ -260,7 +260,7 @@ for (teamListIndex = 0; teamListIndex < teamList.length; teamListIndex++) {
 	for (teamEventIndex = 0; teamEventIndex < actualTeamEvents.length; teamEventIndex++) {
 		var currentEventPoints = calculateEventPointsTotal(teamList[teamListIndex].key, actualTeamEvents[teamEventIndex]);
 		var currentCell = row.insertCell(cellNumberPlaceHolder);
-		currentCell.innerHTML = "<td>" + currentEventPoints + "(" + actualTeamEvents[teamEventIndex].key + ")";
+		currentCell.innerHTML = "<td title='" + actualTeamEvents[teamEventIndex].key + "'>" + currentEventPoints;
 		//console.log(currentEventPoints, actualTeamEvents[teamEventIndex]);
 		cellNumberPlaceHolder++;
 	}
