@@ -97,12 +97,17 @@ function returnAwardPoints(team, event) {
 	var awards = getTBA("team/" + team +  "/event/" + event + "/awards");
 	var eventType = getTBA("event/" + event).event_type;
 	championshipEventTypes = [3,4]; //These were taken from TBA sourcecode.  https://github.com/the-blue-alliance/the-blue-alliance/blob/master/consts/event_type.py#L2
-	
+	rookieAwardIds = [10,14,15];
 	for (i = 0; i < awards.length; i++) {
 		if (championshipEventTypes.includes(eventType)) {
 			if (awards[i].award_type in awardCmpTable) {
 			totalPoints+=(awardCmpTable[awards[i].award_type]);
 		}else {
+			if (awards[i].award_type in rookieAwardId) {
+				if !(document.getElementById('rookiePoints').checked) {
+					pass;
+				}
+			}
 			totalPoints+=10; //All other awards are 10 at CMP.
 		}
 		};
@@ -111,6 +116,11 @@ function returnAwardPoints(team, event) {
 			totalPoints+=(awardLookupTable[awards[i].award_type]);
 		}
 		else {
+			if (awards[i].award_type in rookieAwardId) {
+				if !(document.getElementById('rookiePoints').checked) {
+					pass;
+				}
+			}
 			totalPoints+=5; //All other awards are 5 according to rules.
 			}
 		}
@@ -284,7 +294,7 @@ for (teamListIndex = 0; teamListIndex < teamList.length; teamListIndex++) {
 	<div><input id="alliancePointsBool" checked type="checkbox">Include Alliance Points</input></div>
 	<div><input id="playoffPointsBool" checked type="checkbox">Include Playoff Points</input></div>
 	<hr>
-	<div><input type="checkbox">Include Championship Points</input></div>
+	<div><input id="rookiePoints" checked type="checkbox">Include Rookie Points</input></div>
         <button class="pure-button pure-button-primary fullwidth" onclick="theBigKahuna()" >Get Team Data</button>
 
 
