@@ -103,9 +103,9 @@ function returnAwardPoints(team, event) {
 			if (awards[i].award_type in awardCmpTable) {
 			totalPoints+=(awardCmpTable[awards[i].award_type]);
 		}else {
-			if (awards[i].award_type in rookieAwardId) {
-				if !(document.getElementById('rookiePoints').checked) {
-					pass;
+			if (awards[i].award_type in rookieAwardIds) {
+				if (!document.getElementById('rookiePoints').checked) {
+					totalPoints-=10;
 				}
 			}
 			totalPoints+=10; //All other awards are 10 at CMP.
@@ -116,9 +116,9 @@ function returnAwardPoints(team, event) {
 			totalPoints+=(awardLookupTable[awards[i].award_type]);
 		}
 		else {
-			if (awards[i].award_type in rookieAwardId) {
-				if !(document.getElementById('rookiePoints').checked) {
-					pass;
+			if (awards[i].award_type in rookieAwardIds) {
+				if (!document.getElementById('rookiePoints').checked) {
+					totalPoints=-5;
 				}
 			}
 			totalPoints+=5; //All other awards are 5 according to rules.
