@@ -10,12 +10,6 @@
 	user-select: none;
 }
 
-body {
-	background-color: #a1a1a1;
-	background-image: url('https://mms.businesswire.com/media/20140427005027/en/413118/5/Confetti_shot.jpg');
-	font-family: "BodoniSvtyTwoOSITCTT-Bold", "Georgia", serif;
-	text-rendering: optimizeLegibility;
-}
 
 #container {
 	width: 790px;
