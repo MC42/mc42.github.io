@@ -90,16 +90,17 @@ function draw() {
   cv.clearRect(0,0,w,h);
   for(i=0; i<nstrs;i++){
 	strs[i].draw();
-	strs[i].x -= strs[i].speed/2;
-	if(strs[i].x <= 0){
-	  strs[i] = new Star(w,rInt(0,h),rInt(1,6)/3,rInt(1,3),rInt(4,10)/10);
+	strs[i].y -= strs[i].speed/2;
+	if(strs[i].y <= 0){
+	  console.log(strs[i].y);
+	  strs[i] = new Star(rInt(0,w),h,rInt(1,8)/3,rInt(1,3),rInt(6,10)/10);
 	}
   }
   window.requestAnimationFrame(draw);
 }
 function init() {
   for(i=0; i<nstrs;i++) {
-	strs[i] = new Star(rInt(0,w),rInt(0,h),rInt(1,6)/3,rInt(1,5),rInt(4,10)/10);
+	strs[i] = new Star(rInt(0,w),rInt(0,h),rInt(1,8)/3,rInt(1,5),rInt(4,10)/10);
   }
   draw();
 }
