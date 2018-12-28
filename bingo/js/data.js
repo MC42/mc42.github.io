@@ -56,6 +56,18 @@ var JSONBingo = {"squares": [
 {"square": "Arcade machine from teaser"},
 {"square": "Demin clothing that is not jeans"},
 {"square": "\"Reee-cycle\""},
+    //2019 Updates
+{"square": "\"Presented By the Boeing Company\" said more than 15 times"}, 
+{"square": "\"Presented By the Boeing Company\" said 3x in > 3 minutes."}, 
+{"square": "Neil Degrasse Tyson"}, 
+{"square": "shuttle launch intro"}, 
+{"square": "Dean @ NASA"},     
+{"square": "Footage from I.S.S."},     
+{"square": "High level gov't official"}, 
+{"square": "Mention of how many live viewers"}, 
+{"square": "Mention of how many events"}, 
+{"square": "Championship explanation"}, 
+{"square": "People not wearing safety glasses."}, 
 {"square": "\"Jokes\""}, 
 {"square" : "Sleep deprived FRC Engineering members"} 
     ]
