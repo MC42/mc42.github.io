@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+<title>
+FRC Reaction Tracker
+</title>
+<style>
+
+html,body {
+	background: rgb(72, 70, 181);
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 100%;
+}
+
+canvas {
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	transition: transform 100ms ease;
+}
+
+#outPopUp {
+
+	display: -webkit-box;  /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+	display: -ms-flexbox;  /* TWEENER - IE 10 */
+	display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+	display: flex;		 /* NEW, Spec - Firefox, Chrome, Opera */
+  
+	justify-content: center;
+	align-items: center;
+
+
+	position: absolute;
+	width: 600px;
+	height: 400px;
+	z-index: 15;
+	top: 50%;
+	left: 50%;
+	margin: -200px 0 0 -300px;
+	background: rgba(0, 0, 0, 0.34);
+	font-family: 'Sans';
+	color:white;
+	font-size: 10vh;
+}
+
+#countdown-finish-time {
+	display: none;
+}
+
+</style>
+
+<script>
+window.addEventListener("gamepadconnected", function(e) {
+  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+    e.gamepad.index, e.gamepad.id,
+    e.gamepad.buttons.length, e.gamepad.axes.length);
+
+});
+</script>
+<div id="outPopUp">
+
+<img src="dpad.svg">
+
+</div>
+</div>
+</body>
