@@ -44,7 +44,7 @@ pre code {
 
 <h3>REV Status Frames</h3>
 <p>If we take a look at the Spark Max docs in the CANSparkMaxLowLevel class, we can find the <a href="https://www.revrobotics.com/content/sw/max/sw-docs/cpp/classrev_1_1_c_a_n_spark_max_low_level.html#a128d63d2380cce0c9940941b45c22df5">SetPeriodicFramePeriod()</a> function, that takes in a PeriodicStatus0/1/2 object.  What does each one do though, and where can we find them?</p>
-<p>REV exposes these as attributes of the PeriodicStatus0/1/2 classes, and below are the categories.  (also in the docs <a href="https://www.revrobotics.com/content/sw/max/sw-docs/cpp/_c_a_n_spark_max_low_level_8h_source.html">here</a>). 
+<p>REV exposes these as attributes of the PeriodicStatus0/1/2 classes, and below are the categories.  (also in the library source <a href="https://www.revrobotics.com/content/sw/max/sw-docs/cpp/_c_a_n_spark_max_low_level_8h_source.html">here.)</a>
 <pre>
 <code>
      struct PeriodicStatus0 {
@@ -76,7 +76,8 @@ pre code {
 </pre>
 <p>The first group is the most important, and as such, is why REV defaults to sending it out at 10ms (100Hz).  We're unlikely to change this one.  The second group contains sensor velocity (encoder), temperature, bus voltage (battery voltage reaching the motor controller), and output current.  In the event of using a Spark Max to drive a brushed motor (for example), we will not need the majority of this data.  As such, as can configure it to transmit status frames less frequently.  </p>
 
-<p>The third group is the least used. containing only sensor position, integral accumulation (internal to the PID controller), and the timestamp of the status itself.  This one is rarely used and is very unlikely to be a major issue given it contains significantly less data than the other two groups.<p>
+<p>The third group is the least used. containing only sensor position, integral accumulation (internal to the PID controller), and the timestamp of the status itself.  This one is rarely used and is very unlikely to be a major issue given it contains significantly less data than the other two groups.</p>
+<p>More specific explanations of each item and category can be found in the REV Documentation <a href="https://docs.revrobotics.com/sparkmax/operating-modes-1/control-interfaces#can-interface">here.</a></p>
 
 <h3>CTRE Status Frames</h3>
 <p>The same logic as above applies to CTRE devices, as outlined in <a href="https://phoenix-documentation.readthedocs.io/en/latest/ch18_CommonAPI.html"><i> their</i> documentation.</a>  I'll spare the minutae of it, given that CTRE has outlined 11 groups for motor controllers, 9 for IMUs, and 6 for the CANifier.  Reading through the frame periods on a device by device basis may call out frame periods that you can safely change.  keep in mind the eqivalent function will be called differently.  The equivalent function in their documentation can be (at time of writing) found <a href="https://www.ctr-electronics.com/downloads/api/java/html/classcom_1_1ctre_1_1phoenix_1_1motorcontrol_1_1can_1_1_base_motor_controller.html#a96856d8d3ecc40f4ad4aad550c5996ae">here.</a></p>
