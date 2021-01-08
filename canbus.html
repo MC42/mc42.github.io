@@ -26,6 +26,7 @@ pre code {
 </header>
 <p><strong>But why though?</strong></p>
 <p> Every FRC team has a CAN bus, but in the soon to arrive era of CAN sensors galore, COTS swerve, and <a href="https://www.firstinspires.org/robotics/frc/blog/2021-control-system-update">20 motor slots on the new PDP</a>, it's worth a look into strategically using your CAN bus for when utilization gets high.</p>
+<p>Warning: This topic may be educational, but changing the discussed items without as much knowledge as possible may result in a robot that works worse than when you started, or is more dangerous.  This article is not intended to be exhaustive.  Be careful.</p>
 
 <h3>Basics</h3>
 <p>The CAN bus is a 1Mbps bus running on two wires, terminated at either end with a 120Ω resistor (one inside the roboRIO, one in the PDP).  The technical details aren't super important here though because generally for FRC teams, it "just works" with no effort.  When does it not though?</p>
