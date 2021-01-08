@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><meta
+charset="utf-8"><meta
+name="viewport" content="width=device-width, initial-scale=1">
+<title>Kim's Rambling | CANbus and FRC Sucks</title>
+
+<style type="text/css">body{margin:40px
+auto;max-width:900px;line-height:1.6;font-size:18px;color:#444;padding:0
+10px}h1,h2,h3{line-height:1.2}
+pre code {
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding-top: 0px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+</style>
+</head>
+
+<body>
+<header>
+<h1><em>FIRST</em> Robotic Competition robots and the CAN bus</h1>
+<aside>Yak-shaving on the CAN't bus</aside>
+</header>
+<p><strong>But why though?</strong></p>
+<p> Every FRC team has a CAN bus, but in the soon to arrive era of CAN sensors galore, COTS swerve, and <a href="https://www.firstinspires.org/robotics/frc/blog/2021-control-system-update">20 motor slots on the new PDP</a>, it's worth a look into strategically using your CAN bus for when utilization gets high.</p>
+
+<h3>Basics</h3>
+<p>The CAN bus is a 1Mbps bus running on two wires, terminated at either end with a 120Ω resistor (one inside the roboRIO, one in the PDP).  The technical details aren't super important here though because generally for FRC teams, it "just works" with no effort.  When does it not though?</p>
+
+<h3>When It Breaks</h3>
+<p>A disconnect anywhere in your CAN chain will result in devices going missing, and a crossed wire will result in everything <i>after</i> the crossed wire vanishing from the bus, potentially causing many control issues.  The subtle issue of CAN <i>utilization</i> is less obvious.  While it's a 1Mbps bus, reflectance (when the signal being sent bounces back) as well as a multitude of electrophysical effects, cause it to not work as well once you exceed approximately 85% utilization.</p>
+<p>Per the Crossing The Road Electronics documentation though, a mere 16 motor controllers (Talon SRXes), a CTRE Pneumatics Control Module, and a Power Distribution Panel, will result in <i>70%</i> utilization.
+<p><img width="100%" src="https://phoenix-documentation.readthedocs.io/en/latest/_images/ds-can-util.png"></img></p>
+<p> Some extrapolation of this neatly tells us that 20 motor controllers will get us to 87%, and additional sensors push it even more.  How can we mitigate this to avoid potential controls issues?</p>
+<h3>Status Frames (and how we ignore them)</h3>
+<p>Status frames are how the motor controllers typically used in FRC announce to other devices on the CAN bus what they're doing and what their overall status is.  This enables us to use features like <a href="https://phoenix-documentation.readthedocs.io/en/latest/ch13_MC.html#follower">motor controller following</a> to only need to command one motor controller, rather than as many as you have moving together.  The rates at which these messages are sent out is largely configurable, and certain configurations of motor controller have no need for certain status frames.</p>
+
+<h3>REV Status Frames</h3>
+<p>If we take a look at the Spark Max docs in the CANSparkMaxLowLevel class, we can find the <a href="https://www.revrobotics.com/content/sw/max/sw-docs/cpp/classrev_1_1_c_a_n_spark_max_low_level.html#a128d63d2380cce0c9940941b45c22df5">SetPeriodicFramePeriod()</a> function, that takes in a PeriodicStatus0/1/2 object.  What does each one do though, and where can we find them?</p>
+<p>REV exposes these as attributes of the PeriodicStatus0/1/2 classes, and below are the categories.  (also in the docs <a href="https://www.revrobotics.com/content/sw/max/sw-docs/cpp/_c_a_n_spark_max_low_level_8h_source.html">here</a>). 
+<pre>
+<code>
+     struct PeriodicStatus0 {
+         double appliedOutput;
+         uint16_t faults;
+         uint16_t stickyFaults;
+         MotorType motorType;
+         bool isFollower;
+         uint8_t lock;
+         uint8_t roboRIO;
+         uint8_t isInverted;
+         uint64_t timestamp;
+     };
+     
+     struct PeriodicStatus1 {
+         double sensorVelocity;
+         uint8_t motorTemperature;
+         double busVoltage;
+         double outputCurrent;
+         uint64_t timestamp;
+     };
+ 
+     struct PeriodicStatus2 {
+         double sensorPosition;
+         double iAccum;
+         uint64_t timestamp;
+     };
+</code>
+</pre>
+<p>The first group is the most important, and as such, is why REV defaults to sending it out at 10ms (100Hz).  We're unlikely to change this one.  The second group contains sensor velocity (encoder), temperature, bus voltage (battery voltage reaching the motor controller), and output current.  In the event of using a Spark Max to drive a brushed motor (for example), we will not need the majority of this data.  As such, as can configure it to transmit status frames less frequently.  </p>
+
+<p>The third group is the least used. containing only sensor position, integral accumulation (internal to the PID controller), and the timestamp of the status itself.  This one is rarely used and is very unlikely to be a major issue given it contains significantly less data than the other two groups.<p>
+
+<h3>CTRE Status Frames</h3>
+<p>The same logic as above applies to CTRE devices, as outlined in <a href="https://phoenix-documentation.readthedocs.io/en/latest/ch18_CommonAPI.html"><i> their</i> documentation.</a>  I'll spare the minutae of it, given that CTRE has outlined 11 groups for motor controllers, 9 for IMUs, and 6 for the CANifier.  Reading through the frame periods on a device by device basis may call out frame periods that you can safely change.  keep in mind the eqivalent function will be called differently.  The equivalent function in their documentation can be (at time of writing) found <a href="https://www.ctr-electronics.com/downloads/api/java/html/classcom_1_1ctre_1_1phoenix_1_1motorcontrol_1_1can_1_1_base_motor_controller.html#a96856d8d3ecc40f4ad4aad550c5996ae">here.</a></p>
+
+<h3>Optimization Strategies</h3>
+<p>So now we know how we can adjust the timing period for CAN devices we tend to use a lot.  But are there other methods we can think about the bus congestion problem.  Because we're likely to use different mechanisms in FRC at different points in a match, we can actually tell our mechanism startup to change the status frame period as needed.  For example, a climb mechanism probably doesn't need to be at maximum update rates when you're firing fuel cells into the goal, and vice versa.  Don't be afraid to experiment, but document what you're doing, check the manufacturer documentation to understand persistence of said status frames, and be sure to ask a CSA for help if need be.  This can help resolve some CAN utilization issues but when done incorrectly can render your robot <i>very nerfed</i>.</p>
+
+<p> - Kim </p>
+</body>
+</html>
