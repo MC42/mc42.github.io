@@ -29,7 +29,10 @@ pre code {
 <p>Warning: This topic may be educational, but changing the discussed items without as much knowledge as possible may result in a robot that works worse than when you started, or is more dangerous.  This article is not intended to be exhaustive.  Be careful.</p>
 
 <h3>Basics</h3>
-<p>The CAN bus is a 1Mbps bus running on two wires, terminated at either end with a 120Ω resistor (one inside the roboRIO, one in the PDP).  The technical details aren't super important here though because generally for FRC teams, it "just works" with no effort.  When does it not though?</p>
+<p>The CAN bus is a 1Mbps bus running on two wires, terminated at either end with a 120Ω resistor (one inside the roboRIO, one in the PDP).  Messages are sent out, and every device on the bus must recieve it, even ifit does nothing with it.  CAN is resilient in the sense that inducted line noise (motors, other voltage, etc.) doesn't significantly interfere with the transmission of data. This is significantly different than things like quadrature encoders, where line noise may trigger false positives on reads.</p>
+<p>When sending a command on the CAN bus (setting a motor speed), a message is sent from the roboRIO to the CAN bus, and listened to by that particular motor or device.  Reading a status update, such as motor temperature on a Spark Max, is <i>free</i> and does not consume bus bandwidth.  This is because of status frames being sent out at a regular interval, but we'll dive into that in a bit.</p>
+
+<p>The minute technical details aren't super important here though because generally for FRC teams, it "just works" with no effort.  When does it not though?</p>
 
 <h3>When It Breaks</h3>
 <p>A disconnect anywhere in your CAN chain will result in devices going missing, and a crossed wire will result in everything <i>after</i> the crossed wire vanishing from the bus, potentially causing many control issues.  The subtle issue of CAN <i>utilization</i> is less obvious.  While it's a 1Mbps bus, reflectance (when the signal being sent bounces back) as well as a multitude of electrophysical effects, cause it to not work as well once you exceed approximately 85% utilization.</p>
@@ -80,6 +83,15 @@ pre code {
 
 <h3>Optimization Strategies</h3>
 <p>So now we know how we can adjust the timing period for CAN devices we tend to use a lot.  But are there other methods we can think about the bus congestion problem.  Because we're likely to use different mechanisms in FRC at different points in a match, we can actually tell our mechanism startup to change the status frame period as needed.  For example, a climb mechanism probably doesn't need to be at maximum update rates when you're firing fuel cells into the goal, and vice versa.</p>
+
+<h3>Example Optimizations</h3>
+<ol>
+<li>When using follower motors, you likely don't need status updates for sensor velocity, bus voltage, motor temperature, etc. (ie. Spark Max use), as you can expect their information to be relatively similar to the leader motor.</li>
+<li>Furthering the above item, even the basic status update may be reduced significantly, but <strong>only</strong> for the motors following another motor.  The followers rely on the output status update of the leader to change their outputs.</li>
+<li>When using a Talon SRX as a simple brushed motor controller, you don't need the quadrature encoder information, as there isn't one connected.</li>
+<li>Most smart motor controllers acting like a 'dumb' motor controller has very little status information you need at a high update rate, and as such can be severely reduced.</li>
+</ol>
+
 <p>If you are encountering issues then this might be a good set of variables to experiment with, but you are not likely to see a performance improvement and you should use caution when changing these values.  This can help resolve some CAN utilization issues but when done incorrectly can render your robot <i>very nerfed</i> or be dangerous.</p>
 
 <p> - Kim </p>
