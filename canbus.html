@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><meta
 charset="utf-8"><meta
 name="viewport" content="width=device-width, initial-scale=1">
-<title>Kim's Rambling | CANbus and FRC Sucks</title>
+<title>Kim's Rambling | CAN bus bandwidth sucks</title>
 
 <style type="text/css">body{margin:40px
 auto;max-width:900px;line-height:1.6;font-size:18px;color:#444;padding:0
@@ -21,7 +21,7 @@ pre code {
 
 <body>
 <header>
-<h1><em>FIRST</em> Robotic Competition robots and the CAN bus</h1>
+<h1><em>FIRST</em> Robotic Competition robots and CAN bus utilization</h1>
 <aside>Yak-shaving on the CAN't bus</aside>
 </header>
 <p><strong>But why though?</strong></p>
@@ -79,7 +79,8 @@ pre code {
 <p>The same logic as above applies to CTRE devices, as outlined in <a href="https://phoenix-documentation.readthedocs.io/en/latest/ch18_CommonAPI.html"><i> their</i> documentation.</a>  I'll spare the minutae of it, given that CTRE has outlined 11 groups for motor controllers, 9 for IMUs, and 6 for the CANifier.  Reading through the frame periods on a device by device basis may call out frame periods that you can safely change.  keep in mind the eqivalent function will be called differently.  The equivalent function in their documentation can be (at time of writing) found <a href="https://www.ctr-electronics.com/downloads/api/java/html/classcom_1_1ctre_1_1phoenix_1_1motorcontrol_1_1can_1_1_base_motor_controller.html#a96856d8d3ecc40f4ad4aad550c5996ae">here.</a></p>
 
 <h3>Optimization Strategies</h3>
-<p>So now we know how we can adjust the timing period for CAN devices we tend to use a lot.  But are there other methods we can think about the bus congestion problem.  Because we're likely to use different mechanisms in FRC at different points in a match, we can actually tell our mechanism startup to change the status frame period as needed.  For example, a climb mechanism probably doesn't need to be at maximum update rates when you're firing fuel cells into the goal, and vice versa.  Don't be afraid to experiment, but document what you're doing, check the manufacturer documentation to understand persistence of said status frames, and be sure to ask a CSA for help if need be.  This can help resolve some CAN utilization issues but when done incorrectly can render your robot <i>very nerfed</i>.</p>
+<p>So now we know how we can adjust the timing period for CAN devices we tend to use a lot.  But are there other methods we can think about the bus congestion problem.  Because we're likely to use different mechanisms in FRC at different points in a match, we can actually tell our mechanism startup to change the status frame period as needed.  For example, a climb mechanism probably doesn't need to be at maximum update rates when you're firing fuel cells into the goal, and vice versa.</p>
+<p>If you are encountering issues then this might be a good set of variables to experiment with, but you are not likely to see a performance improvement and you should use caution when changing these values.  This can help resolve some CAN utilization issues but when done incorrectly can render your robot <i>very nerfed</i> or be dangerous.</p>
 
 <p> - Kim </p>
 </body>
