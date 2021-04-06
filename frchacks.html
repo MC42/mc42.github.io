@@ -74,7 +74,7 @@ the stock radio failing to bridge properly may also cause massive troubleshootin
 <p><strong>NetworkTables (Tuning & Controls Use)</strong></p>
 
 <p>NetworkTables is how WPILib and FRC hardware tends to move data around, for better or worse. That said, it can be an effective tool to change real-time variables on your robot for tuning control loops without needing to deploy more code, speeding up the iterative process itself.</p>
-<p>WPILib has a <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/shuffleboard/advanced-usage/shuffleboard-tuning-pid.html">PID widget for dashboard tuning</a>, but this only really works if you're using the WPILib PIDController, not i you're using motor controller-side PID, like on the Falcon 500, or a Spark Max.  What do you do then?</p>
+<p>WPILib has a <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/shuffleboard/advanced-usage/shuffleboard-tuning-pid.html">PID widget for dashboard tuning</a>, but this only really works if you're using the WPILib PIDController, not if you're using motor controller-side PID, like on the Falcon 500, or a Spark Max.  What do you do then?</p>
 
 <p>Through use of the SmartDashboard items of getNumber(); and putNumber(); you can check every loop if the stored local value is different from the remote NetworkTables one, and if so, change the PID value locally respectively, and configure your motor controller again.  That also works for your setpoint so you can go between your test values fairly quickly.  With that, a task that may have involved redeploying your code entirely now only takes a few seconds.</p>
 
