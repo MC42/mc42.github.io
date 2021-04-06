@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><meta
+charset="utf-8"><meta
+name="viewport" content="width=device-width, initial-scale=1">
+<title>Kim's Rambling | Dirty Tricks To Minimize FRC Downtime & Iterate Faster</title>
+
+<style type="text/css">body{margin:40px
+auto;max-width:900px;line-height:1.6;font-size:18px;color:#444;padding:0
+10px}h1,h2,h3{line-height:1.2}
+pre code {
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding-top: 0px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.bluebox {
+border:solid #009CD7 1.5pt;
+padding:1.0pt 4.0pt 1.0pt 4.0pt;
+background:#C4EEFF;
+}
+</style>
+</head>
+
+<body>
+<header>
+<h1><em>FIRST</em> Robotics Competition has a mediocre control system and you can resolve some of its issues.</h1>
+<aside>It's in Stab-le Condition (2021 Edition)</aside>
+</header>
+<p>So I won't beat around the bush.  Some of this is <i>very experimental</i>, some of this may not go the way you expect it to for a few reasons.  This really is intended to affirm the mediocre-technical to highly technical FRC mentors and students who know what you're doing.  Don't do this blindly, please. It can make your competition experience wildly worse.</p>
+
+<hr>
+
+<p><strong>Batteries</strong></p>
+<p>Not all FRC batteries are made the same.  We legally have 18-20Ah 12V nominal, SLA batteries.  This means they can, in theory, produce approximately 18-20 amps for an hour of normal runtime.  We of course draw thousands of amps out of them lasting several minutes if we're lucky. For this reason we <i>really</i> want to choose some top notch batteries.  This was true with 16 PDP ports, it'll be true in the <a href="https://www.firstinspires.org/robotics/frc/blog/2021-control-system-update">20 PDP slot era</a>.  
+<p><a href="https://www.chiefdelphi.com/t/battery-warning/349310">Some teams</a> even had terrible experiences with the 2019 Kit of Parts battery, and many have echoed their experiences off site. Moral of the story? Call MK and get batteries from them.  <a href="https://www.ctr-electronics.com/battery-beak.html">Beak</a> all of them when in hand, and avoid using batteries used the most recently.  Set aside the less good ones for practice (if your drive team can score with poorly running batteries, they can score with better running ones.)  These batteries have a finite lifespan, after all.</p>
+
+
+<p><strong>Radio</strong></p>
+
+<p>This dumpsterfire of a radio has given plenty of teams problems over the past few years.  They take <i>forever</i> to boot, so the big tip for these is to use redundant power.  2020-R47 says that your radio must be powered by the VRM 12V 2A port, and that doesn't preclude the use of redundant power.  Using a PoE injector in conjunction with the barrel jack to connect the radio to the VRM's 12V 2A ports ensures a faster recovery in the event of a disconnect.  How does this work out though?</p>
+
+<p>If your Ethernet to the radio gets disconnected, the power stays on, so when it wiggles back or whatever it's already resumed.  If your barrel jack wiggles loose and pops out, there's <i>no</i> interruption to use.  The blue box on 2020-R47 specifically states that <div class="bluebox">"that this prohibits using any active POE Injector device to power the radio, but does not prohibit using any PASSIVE CONDUCTORS to inject the VRM power into an Ethernet cable plugged into the radio port labeled “18-24v POE”."</div>  In essence, it's a good wave for any team to do. </p>
+<p><strong>Static Networking & mDNS</strong></p>
+
+<p> Static networking isn't recommended for a lot of teams.  The need to understand field, and at-shop networking can result in difficult to manage situations.  It can even result in inxperienced field staff giving you blatantly incorrect information if you don't know how to rebuke it. However, the ability to connect to the robot even faster in the event of a reboot, and skip the need to get a DHCP lease, as well as mDNS to re-connect to talk to stuff, is a speed boost that can mean the difference between winning and losing that stressful match.</p>
+
+<p>
+The WPILib Docs outline the commonly used IPs for static networking <a href="https://docs.wpilib.org/en/stable/docs/networking/networking-introduction/ip-configurations.html">here</a> and <a href="https://docs.wpilib.org/en/stable/docs/networking/networking-introduction/networking-basics.html">here</a>, but be wary that this isn't the reccomended configuration.  In the event you set your roboRIO to an IP other than the suggested one (10.TE.AM.2) you can type an IP address into the team number box directly to connect to it.  
+</p>
+<p><strong>Off-Radio Switch</strong></p>
+
+<p> The other issue for this radio involves the two Ethernet ports on it.  The issue is that the radio doesn't physically have them on the same "switch", they're bridged in software, and as we all know, software isn't perfect.  Sometimes the bridge between the two ports can fail, and with no easy way to reboot the radio itself on the field, it can be a recipe for disaster.</p>
+
+<p>The easiest thing to do, is of course to do nothing.  Many teams will never run into this issue as their entire "robot network" is the roboRIO and the radio; nothing else.  In the age of Limelights and copious other piles of networked devices on robot though, a network switch is a good idea.  </p>
+
+<p>While the manual specifically tries to caution that
+<div class="bluebox">Placing a switch between the roboRIO and radio may impede the ability for FIELD STAFF to troubleshoot roboRIO connection issues on the FIELD. Teams may be asked to try directly connecting from the radio to roboRIO as part of troubleshooting efforts. </div>
+
+the stock radio failing to bridge properly may also cause massive troubleshooting headache.</p>
+
+<p>The easiest way to properly mitigate this is to purchase a stable, reliable network switch.  Luckily, 900 has already pursued that knowledge in trying to connect Jetsons and Xaviers to their robot network galore. The <a href="https://team900.org/blog/ZebraSwitch/">ZebraSwitch</a> paper covers basically all you need to know about their choice of switch, and their reasoning behind it.</a>
+
+<p><strong>Clumsy Networking & Training </strong></p>
+
+<p>Because the field network doesn't behave like your shop network, and you'd likely want your drive team to practice driving in hostile network environments that make scoring difficult, you want to recreate those to an extent.</p>
+
+<p><a href="https://jagt.github.io/clumsy/">Clumsy</a> makes that possible, and has options to induce latency, drops, reorders, corruption, and more.  Adding some latency and re-ordering should more than approximate the field network during those situations when you <i>really</i> should get a replay but won't.</p>
+
+<p>If you're clever, you could even configure clumsy to only effect your Driver Station packets, your camera, or something else entirely. As a word of caution though, be sure this isn't installed on your real driver station laptop or you might leave it on by accident on the field network; a potentially disasterous scenario for your team.
+
+<p><strong>NetworkTables (Tuning & Controls Use)</strong></p>
+
+<p>NetworkTables is how WPILib and FRC hardware tends to move data around, for better or worse. That said, it can be an effective tool to change real-time variables on your robot for tuning control loops without needing to deploy more code, speeding up the iterative process itself.</p>
+<p>WPILib has a <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/shuffleboard/advanced-usage/shuffleboard-tuning-pid.html">PID widget for dashboard tuning</a>, but this only really works if you're using the WPILib PIDController, not i you're using motor controller-side PID, like on the Falcon 500, or a Spark Max.  What do you do then?</p>
+
+<p>Through use of the SmartDashboard items of getNumber(); and putNumber(); you can check every loop if the stored local value is different from the remote NetworkTables one, and if so, change the PID value locally respectively, and configure your motor controller again.  That also works for your setpoint so you can go between your test values fairly quickly.  With that, a task that may have involved redeploying your code entirely now only takes a few seconds.</p>
+
+<p><strong>Characterization & kF Calculations</strong></p>
+
+<p>I'm not covering this super well, I'm not a mathematician.  All I'll really say is to follow the <a href="https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robot-characterization/introduction.html">docs</a>, and in the event of any major robot changes (like adding / removing mechanisms) you likely want to redo the characterization of your whole robot, and for specific mechanisms, changes there probably want / need to be re-characterized.  
+
+<p><strong>The Future</strong></p>
+
+<p> The FRC landscape is changing lots every year, this may be inaccurate by the time it's widely circulated.  But hopefully it's of some help to you.</p>
+
+<p> - Kim </p>
+</body>
+</html>
